@@ -1,15 +1,9 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
+import 'react-native-gesture-handler';
 import React from 'react';
-import type {PropsWithChildren} from 'react';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {
+  Image,
   SafeAreaView,
-  ScrollView,
   StatusBar,
   StyleSheet,
   Text,
@@ -17,43 +11,7 @@ import {
   View,
 } from 'react-native';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
-
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
-
-function Section({children, title}: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-}
+import {Colors} from 'react-native/Libraries/NewAppScreen';
 
 function App(): React.JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
@@ -61,38 +19,110 @@ function App(): React.JSX.Element {
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
+  const data = [
+    {
+      id: 0,
+      title: 'Hymn for the Weekend',
+      singer: 'Coldplay',
+      imageSrc:
+        'https://i.scdn.co/image/ab67616d0000b2738ff7c3580d429c8212b9a3b6',
+    },
+    {
+      id: 1,
+      title: 'Paradise',
+      singer: 'Coldplay',
+      imageSrc:
+        'https://i.scdn.co/image/ab67616d0000b273de0cd11d7b31c3bd1fd5983d',
+    },
+    {
+      id: 2,
+      title: 'Viva La Vida',
+      singer: 'Coldplay',
+      imageSrc: 'https://i.ytimg.com/vi/dvgZkm1xWPE/maxresdefault.jpg',
+    },
+  ];
+
+  const SONG_HEIGHT = 80;
 
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
+    <GestureHandlerRootView style={{flex: 1}}>
+      <SafeAreaView style={{backgroundColor: '#0E0C0A'}}>
+        <StatusBar
+          barStyle={'light-content'}
+          backgroundColor={backgroundStyle.backgroundColor}
+        />
+        <View style={{backgroundColor: '#0E0C0A', height: '100%'}}>
+          {data.map(eachSong => (
+            <View
+              style={{
+                height: SONG_HEIGHT,
+                flexDirection: 'row',
+                position: 'absolute',
+                top: eachSong.id * SONG_HEIGHT,
+              }}>
+              <View
+                style={{
+                  height: SONG_HEIGHT,
+                  width: '20%',
+                  alignItems: 'center',
+                  justifyContent: 'flex-start',
+                  padding: '3%',
+                }}>
+                <Image
+                  source={{
+                    uri: eachSong.imageSrc,
+                  }}
+                  height={SONG_HEIGHT - 20}
+                  width={`${100 - 3}%`}
+                  borderRadius={8}
+                />
+              </View>
+              <View
+                style={{
+                  width: '60%',
+                  justifyContent: 'space-evenly',
+                }}>
+                <Text
+                  style={{
+                    fontSize: 18,
+                    fontWeight: 'bold',
+                    color: 'white',
+                  }}>
+                  {eachSong.title}
+                </Text>
+                <Text style={{color: 'grey'}}>{eachSong.singer}</Text>
+              </View>
+              <View
+                style={{
+                  width: '20%',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}>
+                <View
+                  style={{
+                    width: '30%',
+                    height: 2,
+                    backgroundColor: 'white',
+                    marginBottom: 5,
+                  }}
+                />
+                <View
+                  style={{
+                    width: '30%',
+                    height: 2,
+                    backgroundColor: 'white',
+                    marginBottom: 5,
+                  }}
+                />
+                <View
+                  style={{width: '30%', height: 2, backgroundColor: 'white'}}
+                />
+              </View>
+            </View>
+          ))}
         </View>
-      </ScrollView>
-    </SafeAreaView>
+      </SafeAreaView>
+    </GestureHandlerRootView>
   );
 }
 
