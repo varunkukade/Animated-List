@@ -10,15 +10,21 @@ import {useGesture} from '../hooks/useGesture';
 
 export const ListItem = ({
   item,
-  setCurrentDragIndex,
   currentDragIndex,
+  setCurrentDragIndex,
   currentPositions,
+  sharedCurrDragIndex,
+  sharedNewDragIndex,
+  isDragging,
 }: TListItem) => {
-  const {gesture, animatedStyles} = useGesture(
-    setCurrentDragIndex,
-    currentDragIndex,
-    currentPositions,
+  const {animatedStyles, gesture} = useGesture(
     item,
+    currentDragIndex,
+    setCurrentDragIndex,
+    currentPositions,
+    sharedCurrDragIndex,
+    sharedNewDragIndex,
+    isDragging,
   );
 
   return (
@@ -40,11 +46,11 @@ export const ListItem = ({
           <Text style={styles.description1}>{item.title}</Text>
           <Text style={styles.description2}>{item.singer}</Text>
         </View>
-        <Animated.View style={styles.draggerContainer}>
+        <View style={styles.draggerContainer}>
           <View style={[styles.dragger, styles.marginBottom]} />
           <View style={[styles.dragger, styles.marginBottom]} />
           <View style={styles.dragger} />
-        </Animated.View>
+        </View>
       </Animated.View>
     </GestureDetector>
   );

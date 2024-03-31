@@ -1,4 +1,5 @@
 import {SharedValue} from 'react-native-reanimated';
+import {TInitialPositions} from './constants';
 
 export type TItem = {
   id: number;
@@ -9,9 +10,10 @@ export type TItem = {
 
 export type TListItem = {
   item: TItem;
-  setCurrentDragIndex: React.Dispatch<React.SetStateAction<number>>;
-  currentDragIndex: number | null;
-  currentPositions: SharedValue<{
-    [key: number]: number;
-  }>;
+  currentDragIndex: number;
+  setCurrentDragIndex: (id: number) => void;
+  currentPositions: SharedValue<TInitialPositions>;
+  sharedCurrDragIndex: SharedValue<number>;
+  sharedNewDragIndex: SharedValue<number>;
+  isDragging: SharedValue<boolean>;
 };
