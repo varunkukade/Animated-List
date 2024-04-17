@@ -38,7 +38,7 @@ export const ListItem = ({
               uri: item.imageSrc,
             }}
             height={SONG_HEIGHT - 20}
-            width={`${100 - 3}%`}
+            width={'97%'}
             borderRadius={8}
           />
         </View>

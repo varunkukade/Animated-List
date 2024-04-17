@@ -4,20 +4,20 @@ import {
   useAnimatedStyle,
   useDerivedValue,
 } from 'react-native-reanimated';
-import {Color_Pallete, SONG_HEIGHT, TInitialPositions} from '../constants';
-import {TItem} from '../types';
+import {Color_Pallete, SONG_HEIGHT} from '../constants';
+import {NullableNumber, TInitialPositions, TItem} from '../types';
 import {Gesture} from 'react-native-gesture-handler';
 
 export const useGesture = (
   item: TItem,
-  currentDragIndex: number,
-  setCurrentDragIndex: (id: number) => void,
+  currentDragIndex: NullableNumber,
+  setCurrentDragIndex: (id: NullableNumber) => void,
   currentPositions: SharedValue<TInitialPositions>,
-  sharedCurrDragIndex: SharedValue<number>,
-  sharedNewDragIndex: SharedValue<number>,
+  sharedCurrDragIndex: SharedValue<NullableNumber>,
+  sharedNewDragIndex: SharedValue<NullableNumber>,
   isDragging: SharedValue<boolean>,
 ) => {
-  const updatedPositions = useDerivedValue(() => {
+  const currentPositionsDerived = useDerivedValue(() => {
     //this function will be run whenever currentPositions change
     return currentPositions.value;
   });
@@ -33,22 +33,22 @@ export const useGesture = (
   });
 
   const derivedIsDragging = useDerivedValue(() => {
-    //this function will be run whenever derviedIsDraggingStarted change
+    //this function will be run whenever isDragging change
     return isDragging.value;
   });
 
   const MIN_BOUNDRY = 0;
   const MAX_BOUNDRY =
-    (Object.keys(updatedPositions.value).length - 1) * SONG_HEIGHT;
+    (Object.keys(currentPositionsDerived.value).length - 1) * SONG_HEIGHT;
 
   const getKeyOfValue = (
     value: number,
     obj: TInitialPositions,
-  ): string | undefined => {
+  ): number | undefined => {
     'worklet';
     for (const [key, val] of Object.entries(obj)) {
       if (val.updatedIndex === value) {
-        return key;
+        return Number(key);
       }
     }
     return undefined; // Return undefined if the value is not found
@@ -58,32 +58,34 @@ export const useGesture = (
     .onBegin(() => {
       isDragging.value = true;
       runOnJS(setCurrentDragIndex)(item.id);
-      sharedCurrDragIndex.value = updatedPositions.value[item.id].updatedIndex;
+      sharedCurrDragIndex.value =
+        currentPositionsDerived.value[item.id].updatedIndex;
     })
     .onUpdate(e => {
-      const updatedTop =
-        updatedPositions.value[currentDragIndex].originalTop + e.translationY;
+      const updatedTopWhileDragging =
+        currentPositionsDerived.value[currentDragIndex].originalTop +
+        e.translationY;
       if (
         derivedSharedCurrDragIndex.value === null ||
-        updatedTop < MIN_BOUNDRY ||
-        updatedTop > MAX_BOUNDRY
+        updatedTopWhileDragging < MIN_BOUNDRY ||
+        updatedTopWhileDragging > MAX_BOUNDRY
       ) {
         return;
       }
 
       //update the top of lifted song so that we can see dragging animation for it
-      //because we supply updatedTop value to the styles for "top" property
+      //because we supply updatedTopWhileDragging value to the styles for "top" property
       currentPositions.value = {
-        ...updatedPositions.value,
+        ...currentPositionsDerived.value,
         [currentDragIndex]: {
-          ...updatedPositions.value[currentDragIndex],
-          updatedTop,
+          ...currentPositionsDerived.value[currentDragIndex],
+          updatedTopWhileDragging,
         },
       };
 
       //calculate the new index where drag is headed to
       sharedNewDragIndex.value = Math.floor(
-        (updatedTop + SONG_HEIGHT / 2) / SONG_HEIGHT,
+        (updatedTopWhileDragging + SONG_HEIGHT / 2) / SONG_HEIGHT,
       );
 
       if (
@@ -92,13 +94,13 @@ export const useGesture = (
         //find original id of the item that currently resides at derivedSharedNewDragIndex index
         const newIndexItemKey = getKeyOfValue(
           derivedSharedNewDragIndex.value,
-          updatedPositions.value,
+          currentPositionsDerived.value,
         );
 
         //find original id of the item that currently resides at derivedSharedCurrDragIndex index
         const currentDragIndexItemKey = getKeyOfValue(
           derivedSharedCurrDragIndex.value,
-          updatedPositions.value,
+          currentPositionsDerived.value,
         );
 
         if (
@@ -106,15 +108,19 @@ export const useGesture = (
           currentDragIndexItemKey !== undefined
         ) {
           //swap the items values present at new index and current index
+          //at newIndexItemKey index, we should update updatedTopWhileDragging to see visual movement of item
+          //also we should update originalTop for that item as next time we want to start and do calculations from new top value
           const newPositions = {
-            ...updatedPositions.value,
+            ...currentPositionsDerived.value,
             [newIndexItemKey]: {
-              ...updatedPositions.value[newIndexItemKey],
+              ...currentPositionsDerived.value[newIndexItemKey],
               updatedIndex: derivedSharedCurrDragIndex.value,
-              updatedTop: derivedSharedCurrDragIndex.value * SONG_HEIGHT,
+              updatedTopWhileDragging:
+                derivedSharedCurrDragIndex.value * SONG_HEIGHT,
+              originalTop: derivedSharedCurrDragIndex.value * SONG_HEIGHT,
             },
             [currentDragIndexItemKey]: {
-              ...updatedPositions.value[currentDragIndexItemKey],
+              ...currentPositionsDerived.value[currentDragIndexItemKey],
               updatedIndex: derivedSharedNewDragIndex.value,
             },
           };
@@ -125,7 +131,7 @@ export const useGesture = (
         }
       }
     })
-    .onEnd(e => {
+    .onEnd(() => {
       if (
         derivedSharedCurrDragIndex.value === null ||
         derivedSharedNewDragIndex.value === null
@@ -136,35 +142,18 @@ export const useGesture = (
       //find original id of the item that currently resides at derivedSharedCurrDragIndex index
       const currentDragIndexItemKey = getKeyOfValue(
         derivedSharedCurrDragIndex.value,
-        updatedPositions.value,
+        currentPositionsDerived.value,
       );
 
       if (currentDragIndexItemKey !== undefined) {
-        /*
-        Here need to find out the items whose position has been changed because of drag, because after
-        drag end, we should update originalTop & updatedTop of those items as next time 
-        we want to start and do calculation from new top value
-        Also as we already changed updatedIndex hence we can use that find out those items
-        */
-        const clonedUpdatedPositions = {...updatedPositions.value};
-        Object.entries(updatedPositions.value).forEach(([key, value]) => {
-          const {updatedIndex} = value;
-          if (key !== updatedIndex.toString()) {
-            //if position has been changed, update originalTop value based on updatedIndex
-            clonedUpdatedPositions[key].originalTop =
-              updatedIndex * SONG_HEIGHT;
-            //if position has been changed, update updatedTop value based on updatedIndex
-            clonedUpdatedPositions[key].updatedTop = updatedIndex * SONG_HEIGHT;
-          }
-        });
-
         const newPositions = {
-          ...clonedUpdatedPositions,
+          ...currentPositionsDerived.value,
           //now also update the values for item whose drag we just stopped
           [currentDragIndexItemKey]: {
-            ...updatedPositions.value[currentDragIndexItemKey],
+            ...currentPositionsDerived.value[currentDragIndexItemKey],
             updatedIndex: derivedSharedNewDragIndex.value,
-            updatedTop: derivedSharedNewDragIndex.value * SONG_HEIGHT,
+            updatedTopWhileDragging:
+              derivedSharedNewDragIndex.value * SONG_HEIGHT,
             originalTop: derivedSharedNewDragIndex.value * SONG_HEIGHT,
           },
         };
@@ -178,7 +167,7 @@ export const useGesture = (
 
   const animatedStyles = useAnimatedStyle(() => {
     return {
-      top: updatedPositions.value[item.id].updatedTop,
+      top: currentPositionsDerived.value[item.id].updatedTopWhileDragging,
       backgroundColor:
         currentDragIndex === item.id && derivedIsDragging.value
           ? Color_Pallete.night_shadow

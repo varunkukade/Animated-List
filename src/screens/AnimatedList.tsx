@@ -3,19 +3,21 @@ import {FlatList, View} from 'react-native';
 
 import {useSharedValue} from 'react-native-reanimated';
 import {ListItem} from '../components/ListItem';
-import {InitialPositions, SONGS, TInitialPositions} from '../constants';
+import {InitialPositions, SONGS} from '../constants';
 import {styles} from './AnimatedList.styles';
+import {NullableNumber, TInitialPositions} from '../types';
 
 export const AnimatedList = () => {
-  const [currentDragIndex, setCurrentDragIndex] = useState<number>(null);
+  const [currentDragIndex, setCurrentDragIndex] =
+    useState<NullableNumber>(null);
 
   const currentPositions = useSharedValue<TInitialPositions>(InitialPositions);
-  const sharedCurrDragIndex = useSharedValue(null);
-  const sharedNewDragIndex = useSharedValue<number>(null);
+  const sharedCurrDragIndex = useSharedValue<NullableNumber>(null);
+  const sharedNewDragIndex = useSharedValue<NullableNumber>(null);
   const isDragging = useSharedValue<boolean>(false);
 
   const renderCell = useCallback(
-    ({index, style, ...props}) => {
+    ({index, style, ...props}: any) => {
       const zIndex = {
         zIndex:
           currentPositions.value[index].updatedIndex === currentDragIndex

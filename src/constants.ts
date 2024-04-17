@@ -1,3 +1,5 @@
+import {TInitialPositions} from './types';
+
 export const SONG_HEIGHT = 80;
 export const SONGS = [
   {
@@ -43,44 +45,36 @@ export const SONGS = [
   },
 ];
 
-export type TInitialPositions = {
-  [key: number]: {
-    updatedIndex: number;
-    originalTop: number;
-    updatedTop: number;
-  };
-};
-
 export const InitialPositions: TInitialPositions = {
   0: {
     updatedIndex: 0,
     originalTop: 0 * SONG_HEIGHT,
-    updatedTop: 0 * SONG_HEIGHT,
+    updatedTopWhileDragging: 0 * SONG_HEIGHT,
   },
   1: {
     updatedIndex: 1,
     originalTop: 1 * SONG_HEIGHT,
-    updatedTop: 1 * SONG_HEIGHT,
+    updatedTopWhileDragging: 1 * SONG_HEIGHT,
   },
   2: {
     updatedIndex: 2,
     originalTop: 2 * SONG_HEIGHT,
-    updatedTop: 2 * SONG_HEIGHT,
+    updatedTopWhileDragging: 2 * SONG_HEIGHT,
   },
   3: {
     updatedIndex: 3,
     originalTop: 3 * SONG_HEIGHT,
-    updatedTop: 3 * SONG_HEIGHT,
+    updatedTopWhileDragging: 3 * SONG_HEIGHT,
   },
   4: {
     updatedIndex: 4,
     originalTop: 4 * SONG_HEIGHT,
-    updatedTop: 4 * SONG_HEIGHT,
+    updatedTopWhileDragging: 4 * SONG_HEIGHT,
   },
   5: {
     updatedIndex: 5,
     originalTop: 5 * SONG_HEIGHT,
-    updatedTop: 5 * SONG_HEIGHT,
+    updatedTopWhileDragging: 5 * SONG_HEIGHT,
   },
 };
 
