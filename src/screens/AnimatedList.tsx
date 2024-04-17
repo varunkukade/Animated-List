@@ -10,6 +10,12 @@ import {NullableNumber, TInitialPositions} from '../types';
 export const AnimatedList = () => {
   const [currentDragIndex, setCurrentDragIndex] =
     useState<NullableNumber>(null);
+  /*
+  Issues to solve
+  1. Solve zindex issue after 1st drag ends
+  2. Drag only when you click on side three bars to make it compatible with scrollview
+  3. Add long list and drag item most down. Item should be draggable beyond height of device
+  */
 
   const currentPositions = useSharedValue<TInitialPositions>(InitialPositions);
   const sharedCurrDragIndex = useSharedValue<NullableNumber>(null);
