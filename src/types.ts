@@ -9,12 +9,10 @@ export type TItem = {
 
 export type TListItem = {
   item: TItem;
-  currDragItemId: SharedValue<NullableNumber>;
+  isDragging: SharedValue<number>;
+  draggedItemId: SharedValue<NullableNumber>;
   currentSongPositions: SharedValue<TSongPositions>;
   currentTopValues: SharedValue<TTopValues>;
-  sharedCurrDragIndex: SharedValue<NullableNumber>;
-  sharedNewDragIndex: SharedValue<NullableNumber>;
-  isDragging: SharedValue<number>;
 };
 
 export type TSongPositions = {

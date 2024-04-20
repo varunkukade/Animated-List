@@ -137,6 +137,10 @@ export const getInitialTopValues = (): TTopValues => {
 export const Color_Pallete = {
   metal_black: '#0E0C0A',
   night_shadow: '#1C1C1C',
+  crystal_white: '#FFFFFF',
 };
 
 export const ANIMATION_DURATION = 600;
+
+export const MIN_BOUNDRY = 0;
+export const MAX_BOUNDRY = (SONGS.length - 1) * SONG_HEIGHT;

@@ -13,20 +13,25 @@ import {styles} from './AnimatedList.styles';
 import {NullableNumber, TSongPositions, TTopValues} from '../types';
 
 export const AnimatedList = () => {
-  const currDragItemId = useSharedValue<NullableNumber>(null);
-
   /*
-  Issues to solve
-  Add long list and drag item most down. Item should be draggable beyond height of device
+  TODO: Feature to add - Dragging item to bottom and up should scroll the list automatically
+  Item reaches bottommost section - scroll down the list max upto SONGS.length * SONG_HEIGHT
+  Item reaches uppermost section - scroll up to the way to 0
   */
 
+  //will hold the songs position in list at every moment
   const currentSongPositions = useSharedValue<TSongPositions>(
     getInitialPositions(),
   );
+
+  //will hold the top value for any song at every moment
   const currentTopValues = useSharedValue<TTopValues>(getInitialTopValues());
-  const sharedCurrDragIndex = useSharedValue<NullableNumber>(null);
-  const sharedNewDragIndex = useSharedValue<NullableNumber>(null);
-  const isDragging = useSharedValue<number>(0);
+
+  //used to know if drag is happening or not
+  const isDragging = useSharedValue<0 | 1>(0);
+
+  //this will hold id for item which user started dragging
+  const draggedItemId = useSharedValue<NullableNumber>(null);
 
   // const renderCell = useCallback(
   //   ({index, style, ...props}: any) => {
@@ -47,12 +52,10 @@ export const AnimatedList = () => {
           <ListItem
             item={eachSong}
             key={eachSong.id}
-            currDragItemId={currDragItemId}
+            isDragging={isDragging}
+            draggedItemId={draggedItemId}
             currentSongPositions={currentSongPositions}
             currentTopValues={currentTopValues}
-            sharedCurrDragIndex={sharedCurrDragIndex}
-            sharedNewDragIndex={sharedNewDragIndex}
-            isDragging={isDragging}
           />
         ))}
       </ScrollView>

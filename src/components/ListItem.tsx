@@ -9,21 +9,17 @@ import {useGesture} from '../hooks/useGesture';
 
 export const ListItem = ({
   item,
-  currDragItemId,
+  isDragging,
+  draggedItemId,
   currentSongPositions,
   currentTopValues,
-  sharedCurrDragIndex,
-  sharedNewDragIndex,
-  isDragging,
 }: TListItem) => {
   const {animatedStyles, gesture} = useGesture(
     item,
-    currDragItemId,
+    isDragging,
+    draggedItemId,
     currentSongPositions,
     currentTopValues,
-    sharedCurrDragIndex,
-    sharedNewDragIndex,
-    isDragging,
   );
 
   return (
