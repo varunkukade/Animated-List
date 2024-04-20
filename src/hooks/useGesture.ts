@@ -65,14 +65,20 @@ export const useGesture = (
 
   const gesture = Gesture.Pan()
     .onStart(() => {
+      //start dragging
       isDragging.value = withSpring(1);
+
+      //keep track of dragged item
       draggedItemId.value = item.id;
+
+      //store dragged item id for future swap
       currentIndex.value = currentPositionsDerived.value[item.id].updatedIndex;
     })
     .onUpdate(e => {
       if (draggedItemIdDerived.value === null) {
         return;
       }
+
       const updatedTopWhileDragging =
         currentPositionsDerived.value[draggedItemIdDerived.value].updatedTop +
         e.translationY;
@@ -82,6 +88,7 @@ export const useGesture = (
         updatedTopWhileDragging < MIN_BOUNDRY ||
         updatedTopWhileDragging > MAX_BOUNDRY
       ) {
+        //dragging out of bound
         return;
       }
 
@@ -101,13 +108,13 @@ export const useGesture = (
 
       //swap the items present at newIndex and currentIndex
       if (newIndex.value !== currentIndex.value) {
-        //find permanent id of the item that currently resides at newIndex
+        //find id of the item that currently resides at newIndex
         const newIndexItemKey = getKeyOfValue(
           newIndex.value,
           currentPositionsDerived.value,
         );
 
-        //find permanent id of the item that currently resides at currentIndex
+        //find id of the item that currently resides at currentIndex
         const currentDragIndexItemKey = getKeyOfValue(
           currentIndex.value,
           currentPositionsDerived.value,
@@ -123,7 +130,7 @@ export const useGesture = (
             [newIndexItemKey]: currentIndex.value * SONG_HEIGHT,
           };
 
-          //we update updatedTop and updatedIndex as next time we want to start and do calculations from new top value and new index
+          //we update updatedTop and updatedIndex as next time we want to do calculations from new top value and new index
           currentSongPositions.value = {
             ...currentPositionsDerived.value,
             [newIndexItemKey]: {
@@ -173,6 +180,7 @@ export const useGesture = (
           [currentDragIndexItemKey]: newIndex.value * SONG_HEIGHT,
         });
       }
+      //stop dragging
       isDragging.value = withDelay(200, withSpring(0));
     });
 
