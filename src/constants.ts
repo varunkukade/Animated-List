@@ -1,4 +1,4 @@
-import {TInitialPositions} from './types';
+import {TSongPositions, TTopValues} from './types';
 
 export const SONG_HEIGHT = 80;
 export const SONGS = [
@@ -43,39 +43,95 @@ export const SONGS = [
     imageSrc:
       'https://i.scdn.co/image/ab67616d0000b273de09e02aa7febf30b7c02d82',
   },
+  {
+    id: 6,
+    title: 'Dusk Till Dawn (feat. Sia)',
+    singer: 'ZAYN, Sia',
+    imageSrc:
+      'https://i.scdn.co/image/ab67616d0000b27323852b7ef0ecfe29d38d97ee',
+  },
+  {
+    id: 7,
+    title: 'Titanium (feat. Sia)',
+    singer: 'David Guetta, Sia',
+    imageSrc:
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTnwB_jMjMFnQkQOPvENr-diiJfDWFripRHBMSdeaHZyA&s',
+  },
+  {
+    id: 8,
+    title: 'Chandelier',
+    singer: 'Sia',
+    imageSrc:
+      'https://i.scdn.co/image/ab67616d0000b273297b2c53224bd19162f526e3',
+  },
+  {
+    id: 9,
+    title: 'Unstoppable',
+    singer: 'Sia',
+    imageSrc:
+      'https://i.scdn.co/image/ab67616d0000b273754b2fddebe7039fdb912837',
+  },
+  {
+    id: 10,
+    title: 'Cheap Thrills',
+    singer: 'Sia, Sean Paul',
+    imageSrc:
+      'https://i.scdn.co/image/ab67616d0000b2731e6901561bb0cd5697cbfded',
+  },
+  {
+    id: 11,
+    title: 'Elastic Heart',
+    singer: 'Sia',
+    imageSrc:
+      'https://i.scdn.co/image/ab67616d0000b2735d199c9f6e6562aafa5aa357',
+  },
+  {
+    id: 12,
+    title: 'Believer',
+    singer: 'Imagine Dragons',
+    imageSrc:
+      'https://i.scdn.co/image/ab67616d0000b273156aeddf54ed40b1d9d30c9f',
+  },
+  {
+    id: 13,
+    title: 'Let me love you',
+    singer: 'DJ Snake, Justin Bieber',
+    imageSrc:
+      'https://i.scdn.co/image/ab67616d0000b273212d776c31027c511f0ee3bc',
+  },
+  {
+    id: 14,
+    title: 'Lean On',
+    singer: 'Major Lazer',
+    imageSrc:
+      'https://i.scdn.co/image/ab67616d0000b273548910835dbfaf3f79a1dc46',
+  },
+  {
+    id: 15,
+    title: 'Taki Taki',
+    singer: 'DJ Snake',
+    imageSrc:
+      'https://i.scdn.co/image/ab67616d0000b273e105c410a7b390c61a58cbf8',
+  },
 ];
 
-export const InitialPositions: TInitialPositions = {
-  0: {
-    updatedIndex: 0,
-    originalTop: 0 * SONG_HEIGHT,
-    updatedTopWhileDragging: 0 * SONG_HEIGHT,
-  },
-  1: {
-    updatedIndex: 1,
-    originalTop: 1 * SONG_HEIGHT,
-    updatedTopWhileDragging: 1 * SONG_HEIGHT,
-  },
-  2: {
-    updatedIndex: 2,
-    originalTop: 2 * SONG_HEIGHT,
-    updatedTopWhileDragging: 2 * SONG_HEIGHT,
-  },
-  3: {
-    updatedIndex: 3,
-    originalTop: 3 * SONG_HEIGHT,
-    updatedTopWhileDragging: 3 * SONG_HEIGHT,
-  },
-  4: {
-    updatedIndex: 4,
-    originalTop: 4 * SONG_HEIGHT,
-    updatedTopWhileDragging: 4 * SONG_HEIGHT,
-  },
-  5: {
-    updatedIndex: 5,
-    originalTop: 5 * SONG_HEIGHT,
-    updatedTopWhileDragging: 5 * SONG_HEIGHT,
-  },
+export const getInitialPositions = (): TSongPositions => {
+  let songPositions: TSongPositions = {};
+  for (let i = 0; i < SONGS.length; i++) {
+    songPositions[i] = {
+      updatedIndex: i,
+      updatedTop: i * SONG_HEIGHT,
+    };
+  }
+  return songPositions;
+};
+
+export const getInitialTopValues = (): TTopValues => {
+  let initialTopValues: TTopValues = {};
+  for (let i = 0; i < SONGS.length; i++) {
+    initialTopValues[i] = i * SONG_HEIGHT;
+  }
+  return initialTopValues;
 };
 
 export const Color_Pallete = {

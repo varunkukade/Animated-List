@@ -1,25 +1,33 @@
 import {
   SharedValue,
-  runOnJS,
+  interpolate,
+  interpolateColor,
   useAnimatedStyle,
   useDerivedValue,
+  withDelay,
+  withSpring,
 } from 'react-native-reanimated';
 import {Color_Pallete, SONG_HEIGHT} from '../constants';
-import {NullableNumber, TInitialPositions, TItem} from '../types';
+import {NullableNumber, TSongPositions, TItem, TTopValues} from '../types';
 import {Gesture} from 'react-native-gesture-handler';
 
 export const useGesture = (
   item: TItem,
-  currentDragIndex: NullableNumber,
-  setCurrentDragIndex: (id: NullableNumber) => void,
-  currentPositions: SharedValue<TInitialPositions>,
+  currDragItemId: SharedValue<NullableNumber>,
+  currentSongPositions: SharedValue<TSongPositions>,
+  currentTopValues: SharedValue<TTopValues>,
   sharedCurrDragIndex: SharedValue<NullableNumber>,
   sharedNewDragIndex: SharedValue<NullableNumber>,
-  isDragging: SharedValue<boolean>,
+  isDragging: SharedValue<number>,
 ) => {
   const currentPositionsDerived = useDerivedValue(() => {
-    //this function will be run whenever currentPositions change
-    return currentPositions.value;
+    //this function will be run whenever currentSongPositions change
+    return currentSongPositions.value;
+  });
+
+  const currentTopValuesDerived = useDerivedValue(() => {
+    //this function will be run whenever currentTopValues change
+    return currentTopValues.value;
   });
 
   const derivedSharedCurrDragIndex = useDerivedValue(() => {
@@ -37,13 +45,18 @@ export const useGesture = (
     return isDragging.value;
   });
 
+  const currentDragItemIdDerived = useDerivedValue(() => {
+    //this function will be run whenever currDragItemId change
+    return currDragItemId.value;
+  });
+
   const MIN_BOUNDRY = 0;
   const MAX_BOUNDRY =
     (Object.keys(currentPositionsDerived.value).length - 1) * SONG_HEIGHT;
 
   const getKeyOfValue = (
     value: number,
-    obj: TInitialPositions,
+    obj: TSongPositions,
   ): number | undefined => {
     'worklet';
     for (const [key, val] of Object.entries(obj)) {
@@ -55,16 +68,19 @@ export const useGesture = (
   };
 
   const gesture = Gesture.Pan()
-    .onBegin(() => {
-      isDragging.value = true;
-      runOnJS(setCurrentDragIndex)(item.id);
+    .onStart(() => {
+      isDragging.value = withSpring(1);
+      currDragItemId.value = item.id;
       sharedCurrDragIndex.value =
         currentPositionsDerived.value[item.id].updatedIndex;
     })
     .onUpdate(e => {
+      if (currentDragItemIdDerived.value === null) {
+        return;
+      }
       const updatedTopWhileDragging =
-        currentPositionsDerived.value[currentDragIndex].originalTop +
-        e.translationY;
+        currentPositionsDerived.value[currentDragItemIdDerived.value]
+          .updatedTop + e.translationY;
       if (
         derivedSharedCurrDragIndex.value === null ||
         updatedTopWhileDragging < MIN_BOUNDRY ||
@@ -74,13 +90,10 @@ export const useGesture = (
       }
 
       //update the top of lifted song so that we can see dragging animation for it
-      //because we supply updatedTopWhileDragging value to the styles for "top" property
-      currentPositions.value = {
-        ...currentPositionsDerived.value,
-        [currentDragIndex]: {
-          ...currentPositionsDerived.value[currentDragIndex],
-          updatedTopWhileDragging,
-        },
+      //because we supply currentTopValues value to the styles for "top" property
+      currentTopValues.value = {
+        ...currentTopValuesDerived.value,
+        [currentDragItemIdDerived.value]: updatedTopWhileDragging,
       };
 
       //calculate the new index where drag is headed to
@@ -89,6 +102,7 @@ export const useGesture = (
       );
 
       if (
+        derivedSharedNewDragIndex.value !== null &&
         derivedSharedNewDragIndex.value !== derivedSharedCurrDragIndex.value
       ) {
         //find original id of the item that currently resides at derivedSharedNewDragIndex index
@@ -103,28 +117,30 @@ export const useGesture = (
           currentPositionsDerived.value,
         );
 
+        //swap the items values present at new index and current index
         if (
           newIndexItemKey !== undefined &&
           currentDragIndexItemKey !== undefined
         ) {
-          //swap the items values present at new index and current index
-          //at newIndexItemKey index, we should update updatedTopWhileDragging to see visual movement of item
-          //also we should update originalTop for that item as next time we want to start and do calculations from new top value
-          const newPositions = {
+          //we should update updatedTop and updatedIndex for items as next time we want to start and do calculations from new top value and new index
+          const newPositions: TSongPositions = {
             ...currentPositionsDerived.value,
             [newIndexItemKey]: {
               ...currentPositionsDerived.value[newIndexItemKey],
               updatedIndex: derivedSharedCurrDragIndex.value,
-              updatedTopWhileDragging:
-                derivedSharedCurrDragIndex.value * SONG_HEIGHT,
-              originalTop: derivedSharedCurrDragIndex.value * SONG_HEIGHT,
+              updatedTop: derivedSharedCurrDragIndex.value * SONG_HEIGHT,
             },
             [currentDragIndexItemKey]: {
               ...currentPositionsDerived.value[currentDragIndexItemKey],
               updatedIndex: derivedSharedNewDragIndex.value,
             },
           };
-          currentPositions.value = newPositions;
+          currentSongPositions.value = newPositions;
+          //at newIndexItemKey index, we should update top to see visual movement of item
+          currentTopValues.value = {
+            ...currentTopValuesDerived.value,
+            [newIndexItemKey]: derivedSharedCurrDragIndex.value * SONG_HEIGHT,
+          };
 
           //update new index as current index
           sharedCurrDragIndex.value = derivedSharedNewDragIndex.value;
@@ -146,46 +162,77 @@ export const useGesture = (
       );
 
       if (currentDragIndexItemKey !== undefined) {
-        const newPositions = {
+        const newPositions: TSongPositions = {
           ...currentPositionsDerived.value,
           //now also update the values for item whose drag we just stopped
           [currentDragIndexItemKey]: {
             ...currentPositionsDerived.value[currentDragIndexItemKey],
             updatedIndex: derivedSharedNewDragIndex.value,
-            updatedTopWhileDragging:
-              derivedSharedNewDragIndex.value * SONG_HEIGHT,
-            originalTop: derivedSharedNewDragIndex.value * SONG_HEIGHT,
+            updatedTop: derivedSharedNewDragIndex.value * SONG_HEIGHT,
           },
         };
-        currentPositions.value = newPositions;
+        currentSongPositions.value = newPositions;
+
+        currentTopValues.value = withSpring({
+          ...currentTopValuesDerived.value,
+          [currentDragIndexItemKey]:
+            derivedSharedNewDragIndex.value * SONG_HEIGHT,
+        });
 
         //update new index as current index
         sharedCurrDragIndex.value = derivedSharedNewDragIndex.value;
       }
-      isDragging.value = false;
+      isDragging.value = withDelay(200, withSpring(0));
     });
 
   const animatedStyles = useAnimatedStyle(() => {
     return {
-      top: currentPositionsDerived.value[item.id].updatedTopWhileDragging,
+      top: currentTopValues.value[item.id],
+      transform: [
+        {
+          scale:
+            currentDragItemIdDerived.value === item.id
+              ? interpolate(derivedIsDragging.value, [0, 1], [1, 1.025])
+              : interpolate(derivedIsDragging.value, [0, 1], [1, 0.98]),
+        },
+      ],
       backgroundColor:
-        currentDragIndex === item.id && derivedIsDragging.value
-          ? Color_Pallete.night_shadow
+        currentDragItemIdDerived.value === item.id && derivedIsDragging.value
+          ? interpolateColor(
+              derivedIsDragging.value,
+              [0, 1],
+              [Color_Pallete.metal_black, Color_Pallete.night_shadow],
+            )
           : Color_Pallete.metal_black,
+
       shadowColor:
-        currentDragIndex === item.id && derivedIsDragging.value
-          ? 'white'
+        currentDragItemIdDerived.value === item.id && derivedIsDragging.value
+          ? interpolateColor(
+              derivedIsDragging.value,
+              [0, 1],
+              [Color_Pallete.metal_black, 'white'],
+            )
           : undefined,
       shadowOffset: {
         width: 0,
-        height: currentDragIndex === item.id && derivedIsDragging.value ? 7 : 0,
+        height:
+          currentDragItemIdDerived.value === item.id && derivedIsDragging.value
+            ? interpolate(derivedIsDragging.value, [0, 1], [0, 7])
+            : 0,
       },
       shadowOpacity:
-        currentDragIndex === item.id && derivedIsDragging.value ? 0.2 : 0,
+        currentDragItemIdDerived.value === item.id && derivedIsDragging.value
+          ? interpolate(derivedIsDragging.value, [0, 1], [0, 0.2])
+          : 0,
       shadowRadius:
-        currentDragIndex === item.id && derivedIsDragging.value ? 10 : 0,
+        currentDragItemIdDerived.value === item.id && derivedIsDragging.value
+          ? interpolate(derivedIsDragging.value, [0, 1], [0, 10])
+          : 0,
       elevation:
-        currentDragIndex === item.id && derivedIsDragging.value ? 5 : 0, // For Android,
+        currentDragItemIdDerived.value === item.id && derivedIsDragging.value
+          ? interpolate(derivedIsDragging.value, [0, 1], [0, 5])
+          : 0, // For Android,
+      zIndex: currentDragItemIdDerived.value === item.id ? 1 : 0,
     };
   });
 

@@ -37,4 +37,8 @@ export const styles = StyleSheet.create({
     height: 2,
     backgroundColor: 'white',
   },
+  image: {
+    height: SONG_HEIGHT - 20,
+    width: '97%',
+  },
 });

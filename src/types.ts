@@ -9,20 +9,23 @@ export type TItem = {
 
 export type TListItem = {
   item: TItem;
-  currentDragIndex: NullableNumber;
-  setCurrentDragIndex: (id: NullableNumber) => void;
-  currentPositions: SharedValue<TInitialPositions>;
+  currDragItemId: SharedValue<NullableNumber>;
+  currentSongPositions: SharedValue<TSongPositions>;
+  currentTopValues: SharedValue<TTopValues>;
   sharedCurrDragIndex: SharedValue<NullableNumber>;
   sharedNewDragIndex: SharedValue<NullableNumber>;
-  isDragging: SharedValue<boolean>;
+  isDragging: SharedValue<number>;
 };
 
-export type TInitialPositions = {
+export type TSongPositions = {
   [key: number]: {
     updatedIndex: number;
-    originalTop: number;
-    updatedTopWhileDragging: number;
+    updatedTop: number;
   };
+};
+
+export type TTopValues = {
+  [key: number]: number;
 };
 
 export type NullableNumber = null | number;
