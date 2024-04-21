@@ -5,7 +5,7 @@ import {useSharedValue} from 'react-native-reanimated';
 import {ListItem} from '../components/ListItem';
 import {getInitialPositions, SONGS, SONG_HEIGHT} from '../constants';
 import {styles} from './AnimatedList.styles';
-import {NullableNumber, TSongPositions, TTopValues} from '../types';
+import {NullableNumber, TSongPositions} from '../types';
 
 export const AnimatedList = () => {
   /*
@@ -36,6 +36,12 @@ export const AnimatedList = () => {
   //   },
   //   [currentDragIndex],
   // );
+
+  // const [totalHeight, setTotalHeight] = useState(0);
+
+  // const updateTotalHeight = (height: number) => {
+  //   setTotalHeight(prevTotal => prevTotal + height);
+  // };
 
   return (
     <View style={styles.listContainer}>
