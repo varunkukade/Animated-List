@@ -10,13 +10,8 @@ import {
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
-import {
-  Color_Pallete,
-  MAX_BOUNDRY,
-  MIN_BOUNDRY,
-  SONG_HEIGHT,
-} from '../constants';
-import {NullableNumber, TSongPositions, TItem} from '../types';
+import {Color_Pallete, SONGS, SONG_HEIGHT, getSum} from '../constants';
+import {NullableNumber, TSongPositions, TItem, TSongsHeight} from '../types';
 import {Gesture} from 'react-native-gesture-handler';
 
 export const useGesture = (
@@ -24,6 +19,7 @@ export const useGesture = (
   isDragging: SharedValue<number>,
   draggedItemId: SharedValue<NullableNumber>,
   currentSongPositions: SharedValue<TSongPositions>,
+  songsHeight: TSongsHeight,
 ) => {
   //used for swapping with currentIndex
   const newIndex = useSharedValue<NullableNumber>(null);
@@ -35,7 +31,7 @@ export const useGesture = (
     return currentSongPositions.value;
   });
 
-  const top = useSharedValue(item.id * SONG_HEIGHT);
+  const top = useSharedValue(item.id * songsHeight[item.id]);
 
   const isDraggingDerived = useDerivedValue(() => {
     return isDragging.value;
@@ -43,35 +39,6 @@ export const useGesture = (
 
   const draggedItemIdDerived = useDerivedValue(() => {
     return draggedItemId.value;
-  });
-
-  useAnimatedReaction(
-    () => {
-      return currentSongPositionsDerived.value[item.id].updatedIndex;
-    },
-    (currentValue, previousValue) => {
-      if (currentValue !== previousValue) {
-        if (
-          draggedItemIdDerived.value !== null &&
-          item.id === draggedItemIdDerived.value
-        ) {
-          top.value = withSpring(
-            currentSongPositionsDerived.value[item.id].updatedIndex *
-              SONG_HEIGHT,
-          );
-        } else {
-          top.value = withTiming(
-            currentSongPositionsDerived.value[item.id].updatedIndex *
-              SONG_HEIGHT,
-            {duration: 500},
-          );
-        }
-      }
-    },
-  );
-
-  const isCurrentDraggingItem = useDerivedValue(() => {
-    return isDraggingDerived.value && draggedItemIdDerived.value === item.id;
   });
 
   const getKeyOfValue = (
@@ -86,6 +53,44 @@ export const useGesture = (
     }
     return undefined; // Return undefined if the value is not found
   };
+
+  useAnimatedReaction(
+    () => {
+      return currentSongPositionsDerived.value[item.id].updatedTopWhileDragging;
+    },
+    (currentValue, previousValue) => {
+      if (currentValue !== previousValue) {
+        const updatedTopWhileDragging =
+          currentSongPositionsDerived.value[item.id].updatedTopWhileDragging;
+        if (
+          draggedItemIdDerived.value !== null &&
+          item.id === draggedItemIdDerived.value
+        ) {
+          top.value = withSpring(updatedTopWhileDragging);
+        } else {
+          top.value = withTiming(updatedTopWhileDragging, {duration: 500});
+        }
+      }
+    },
+    [
+      currentSongPositionsDerived.value,
+      songsHeight,
+      draggedItemIdDerived.value,
+    ],
+  );
+
+  const isCurrentDraggingItem = useDerivedValue(() => {
+    return isDraggingDerived.value && draggedItemIdDerived.value === item.id;
+  });
+
+  const MIN_BOUNDRY = 0;
+  const lastIndexItemId = getKeyOfValue(
+    SONGS.length - 1,
+    currentSongPositionsDerived.value,
+  );
+  const MAX_BOUNDRY =
+    getSum(songsHeight) -
+    (lastIndexItemId !== undefined ? songsHeight[lastIndexItemId] : 0);
 
   const gesture = Gesture.Pan()
     .onStart(() => {
@@ -143,11 +148,25 @@ export const useGesture = (
             ...currentSongPositionsDerived.value,
             [newIndexItemKey]: {
               ...currentSongPositionsDerived.value[newIndexItemKey],
+              updatedTopWhileDragging:
+                newIndex > currentIndex
+                  ? currentSongPositionsDerived.value[newIndexItemKey]
+                      .updatedTopWhileDragging -
+                    songsHeight[currentDragIndexItemKey]
+                  : currentSongPositionsDerived.value[newIndexItemKey]
+                      .updatedTopWhileDragging + songsHeight[newIndexItemKey],
               updatedIndex: currentIndex.value,
               updatedTop: currentIndex.value * SONG_HEIGHT,
             },
             [currentDragIndexItemKey]: {
               ...currentSongPositionsDerived.value[currentDragIndexItemKey],
+              updatedTopWhileDragging:
+                newIndex > currentIndex
+                  ? currentSongPositionsDerived.value[currentDragIndexItemKey]
+                      .updatedTopWhileDragging +
+                    songsHeight[currentDragIndexItemKey]
+                  : currentSongPositionsDerived.value[currentDragIndexItemKey]
+                      .updatedTopWhileDragging - songsHeight[newIndexItemKey],
               updatedIndex: newIndex.value,
             },
           };

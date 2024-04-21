@@ -1,8 +1,8 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {Image, Text, View} from 'react-native';
 
 import {GestureDetector} from 'react-native-gesture-handler';
-import Animated from 'react-native-reanimated';
+import Animated, {useDerivedValue} from 'react-native-reanimated';
 import {TListItem} from '../types';
 import {styles} from './ListItem.styles';
 import {useGesture} from '../hooks/useGesture';
@@ -12,29 +12,42 @@ export const ListItem = ({
   isDragging,
   draggedItemId,
   currentSongPositions,
-}: // updateTotalHeight,
-TListItem) => {
+  songsHeight,
+  updateTotalHeight,
+}: TListItem) => {
   const {animatedStyles, gesture} = useGesture(
     item,
     isDragging,
     draggedItemId,
     currentSongPositions,
+    songsHeight,
   );
+
+  const isDraggingDerived = useDerivedValue(() => {
+    return isDragging.value;
+  });
+
+  const [cellHeight, setCellHeight] = useState(0);
+  console.log('cellHeight', item.id, cellHeight);
 
   return (
     <Animated.View
-      // onLayout={event => {
-      //   const {height} = event.nativeEvent.layout;
-      //   updateTotalHeight(height);
-      // }}
+      onLayout={event => {
+        const {height} = event.nativeEvent.layout;
+        if (!isDraggingDerived.value) {
+          updateTotalHeight(item.id, height);
+          console.log('height', height);
+          setCellHeight(height);
+        }
+      }}
       key={item.id}
-      style={[styles.itemContainer, animatedStyles]}>
-      <View style={styles.imageContainer}>
+      style={[styles.itemContainer, animatedStyles, {height: cellHeight}]}>
+      <View style={[styles.imageContainer, {height: cellHeight}]}>
         <Image
           source={{
             uri: item.imageSrc,
           }}
-          style={styles.image}
+          style={[styles.image, {height: cellHeight - 20}]}
           borderRadius={8}
         />
       </View>

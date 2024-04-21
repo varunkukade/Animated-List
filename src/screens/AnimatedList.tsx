@@ -1,11 +1,16 @@
-import React from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {ScrollView, View} from 'react-native';
 
 import {useSharedValue} from 'react-native-reanimated';
 import {ListItem} from '../components/ListItem';
-import {getInitialPositions, SONGS, SONG_HEIGHT} from '../constants';
+import {
+  getInitialPositions,
+  SONGS,
+  getInitialHeights,
+  getSum,
+} from '../constants';
 import {styles} from './AnimatedList.styles';
-import {NullableNumber, TSongPositions} from '../types';
+import {NullableNumber, TSongPositions, TSongsHeight} from '../types';
 
 export const AnimatedList = () => {
   /*
@@ -37,15 +42,41 @@ export const AnimatedList = () => {
   //   [currentDragIndex],
   // );
 
-  // const [totalHeight, setTotalHeight] = useState(0);
+  const [songsHeight, setSongsHeight] = useState<TSongsHeight>(
+    getInitialHeights(),
+  );
 
-  // const updateTotalHeight = (height: number) => {
-  //   setTotalHeight(prevTotal => prevTotal + height);
-  // };
+  const totalHeight = useMemo(() => {
+    return getSum(songsHeight);
+  }, [songsHeight]);
+
+  useEffect(() => {
+    'worklet';
+    let newSongPositions = {...currentSongPositions.value};
+    for (let i = 0; i < SONGS.length; i++) {
+      newSongPositions[i] = {
+        ...newSongPositions[i],
+        updatedTop: getSum(songsHeight, i),
+        updatedTopWhileDragging: getSum(songsHeight, i),
+      };
+    }
+    currentSongPositions.value = newSongPositions;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [songsHeight]);
+
+  const updateTotalHeight = (id: number, height: number) => {
+    setSongsHeight(prevHeights => ({
+      ...prevHeights,
+      [id]: height,
+    }));
+  };
 
   return (
     <View style={styles.listContainer}>
-      <ScrollView contentContainerStyle={{height: SONGS.length * SONG_HEIGHT}}>
+      <ScrollView
+        contentContainerStyle={{
+          height: totalHeight,
+        }}>
         {SONGS.map(eachSong => (
           <ListItem
             item={eachSong}
@@ -53,6 +84,8 @@ export const AnimatedList = () => {
             isDragging={isDragging}
             draggedItemId={draggedItemId}
             currentSongPositions={currentSongPositions}
+            songsHeight={songsHeight}
+            updateTotalHeight={updateTotalHeight}
           />
         ))}
       </ScrollView>

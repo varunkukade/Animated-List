@@ -1,18 +1,17 @@
 import {StyleSheet} from 'react-native';
-import {Color_Pallete, SONG_HEIGHT} from '../constants';
+import {Color_Pallete} from '../constants';
 
 export const styles = StyleSheet.create({
   itemContainer: {
-    height: SONG_HEIGHT,
     flexDirection: 'row',
     position: 'absolute',
   },
   imageContainer: {
-    height: SONG_HEIGHT,
     width: '20%',
     alignItems: 'center',
     justifyContent: 'flex-start',
     padding: '3%',
+    backgroundColor: 'red',
   },
   descriptionContainer: {
     width: '60%',
@@ -38,7 +37,6 @@ export const styles = StyleSheet.create({
     backgroundColor: Color_Pallete.crystal_white,
   },
   image: {
-    height: SONG_HEIGHT - 20,
     width: '97%',
   },
 });
