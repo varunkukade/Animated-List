@@ -1,4 +1,4 @@
-import {TSongPositions, TTopValues} from './types';
+import {TSongPositions} from './types';
 
 export const SONG_HEIGHT = 80;
 export const SONGS = [
@@ -124,14 +124,6 @@ export const getInitialPositions = (): TSongPositions => {
     };
   }
   return songPositions;
-};
-
-export const getInitialTopValues = (): TTopValues => {
-  let initialTopValues: TTopValues = {};
-  for (let i = 0; i < SONGS.length; i++) {
-    initialTopValues[i] = i * SONG_HEIGHT;
-  }
-  return initialTopValues;
 };
 
 export const Color_Pallete = {

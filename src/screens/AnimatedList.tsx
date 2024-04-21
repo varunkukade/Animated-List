@@ -3,12 +3,7 @@ import {ScrollView, View} from 'react-native';
 
 import {useSharedValue} from 'react-native-reanimated';
 import {ListItem} from '../components/ListItem';
-import {
-  getInitialPositions,
-  SONGS,
-  SONG_HEIGHT,
-  getInitialTopValues,
-} from '../constants';
+import {getInitialPositions, SONGS, SONG_HEIGHT} from '../constants';
 import {styles} from './AnimatedList.styles';
 import {NullableNumber, TSongPositions, TTopValues} from '../types';
 

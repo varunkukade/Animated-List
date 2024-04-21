@@ -8,6 +8,7 @@ import {
   useSharedValue,
   withDelay,
   withSpring,
+  withTiming,
 } from 'react-native-reanimated';
 import {
   Color_Pallete,
@@ -38,19 +39,6 @@ export const useGesture = (
     currentPositionsDerived.value[item.id].updatedIndex * SONG_HEIGHT,
   );
 
-  useAnimatedReaction(
-    () => {
-      return currentPositionsDerived.value[item.id].updatedIndex;
-    },
-    (currentValue, previousValue) => {
-      if (currentValue !== previousValue) {
-        top.value = withSpring(
-          currentPositionsDerived.value[item.id].updatedIndex * SONG_HEIGHT,
-        );
-      }
-    },
-  );
-
   const isDraggingDerived = useDerivedValue(() => {
     return isDragging.value;
   });
@@ -58,6 +46,29 @@ export const useGesture = (
   const draggedItemIdDerived = useDerivedValue(() => {
     return draggedItemId.value;
   });
+
+  useAnimatedReaction(
+    () => {
+      return currentPositionsDerived.value[item.id].updatedIndex;
+    },
+    (currentValue, previousValue) => {
+      if (currentValue !== previousValue) {
+        if (
+          draggedItemIdDerived.value !== null &&
+          item.id === draggedItemIdDerived.value
+        ) {
+          top.value = withSpring(
+            currentPositionsDerived.value[item.id].updatedIndex * SONG_HEIGHT,
+          );
+        } else {
+          top.value = withTiming(
+            currentPositionsDerived.value[item.id].updatedIndex * SONG_HEIGHT,
+            {duration: 500},
+          );
+        }
+      }
+    },
+  );
 
   const isCurrentDraggingItem = useDerivedValue(() => {
     return isDraggingDerived.value && draggedItemIdDerived.value === item.id;
