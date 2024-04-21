@@ -2,6 +2,7 @@ import {
   SharedValue,
   interpolate,
   interpolateColor,
+  useAnimatedReaction,
   useAnimatedStyle,
   useDerivedValue,
   useSharedValue,
@@ -14,7 +15,7 @@ import {
   MIN_BOUNDRY,
   SONG_HEIGHT,
 } from '../constants';
-import {NullableNumber, TSongPositions, TItem, TTopValues} from '../types';
+import {NullableNumber, TSongPositions, TItem} from '../types';
 import {Gesture} from 'react-native-gesture-handler';
 
 export const useGesture = (
@@ -22,7 +23,6 @@ export const useGesture = (
   isDragging: SharedValue<number>,
   draggedItemId: SharedValue<NullableNumber>,
   currentSongPositions: SharedValue<TSongPositions>,
-  currentTopValues: SharedValue<TTopValues>,
 ) => {
   //used for swapping with currentIndex
   const newIndex = useSharedValue<NullableNumber>(null);
@@ -34,9 +34,22 @@ export const useGesture = (
     return currentSongPositions.value;
   });
 
-  const currentTopValuesDerived = useDerivedValue(() => {
-    return currentTopValues.value;
-  });
+  const top = useSharedValue(
+    currentPositionsDerived.value[item.id].updatedIndex * SONG_HEIGHT,
+  );
+
+  useAnimatedReaction(
+    () => {
+      return currentPositionsDerived.value[item.id].updatedIndex;
+    },
+    (currentValue, previousValue) => {
+      if (currentValue !== previousValue) {
+        top.value = withSpring(
+          currentPositionsDerived.value[item.id].updatedIndex * SONG_HEIGHT,
+        );
+      }
+    },
+  );
 
   const isDraggingDerived = useDerivedValue(() => {
     return isDragging.value;
@@ -79,32 +92,21 @@ export const useGesture = (
         return;
       }
 
-      const updatedTopWhileDragging =
+      const newTop =
         currentPositionsDerived.value[draggedItemIdDerived.value].updatedTop +
         e.translationY;
 
       if (
         currentIndex.value === null ||
-        updatedTopWhileDragging < MIN_BOUNDRY ||
-        updatedTopWhileDragging > MAX_BOUNDRY
+        newTop < MIN_BOUNDRY ||
+        newTop > MAX_BOUNDRY
       ) {
         //dragging out of bound
         return;
       }
 
-      /*
-      Update the currentTopValues of lifted song so that we can see dragging animation for it
-      because we supply currentTopValues value to the styles for "top" property
-      */
-      currentTopValues.value = {
-        ...currentTopValuesDerived.value,
-        [draggedItemIdDerived.value]: updatedTopWhileDragging,
-      };
-
       //calculate the new index where drag is headed to
-      newIndex.value = Math.floor(
-        (updatedTopWhileDragging + SONG_HEIGHT / 2) / SONG_HEIGHT,
-      );
+      newIndex.value = Math.floor((newTop + SONG_HEIGHT / 2) / SONG_HEIGHT);
 
       //swap the items present at newIndex and currentIndex
       if (newIndex.value !== currentIndex.value) {
@@ -124,12 +126,6 @@ export const useGesture = (
           newIndexItemKey !== undefined &&
           currentDragIndexItemKey !== undefined
         ) {
-          //we update "top" to see visual movement of item exist at newIndex
-          currentTopValues.value = {
-            ...currentTopValuesDerived.value,
-            [newIndexItemKey]: currentIndex.value * SONG_HEIGHT,
-          };
-
           //we update updatedTop and updatedIndex as next time we want to do calculations from new top value and new index
           currentSongPositions.value = {
             ...currentPositionsDerived.value,
@@ -170,15 +166,6 @@ export const useGesture = (
             updatedTop: newIndex.value * SONG_HEIGHT,
           },
         };
-
-        /* 
-        Update the "top" of dragged item at last.
-        This will realign item to specific flatlist cell.
-        */
-        currentTopValues.value = withSpring({
-          ...currentTopValuesDerived.value,
-          [currentDragIndexItemKey]: newIndex.value * SONG_HEIGHT,
-        });
       }
       //stop dragging
       isDragging.value = withDelay(200, withSpring(0));
@@ -186,7 +173,7 @@ export const useGesture = (
 
   const animatedStyles = useAnimatedStyle(() => {
     return {
-      top: currentTopValues.value[item.id],
+      top: top.value,
       transform: [
         {
           scale: isCurrentDraggingItem.value
@@ -226,11 +213,7 @@ export const useGesture = (
         : 0, // For Android,
       zIndex: isCurrentDraggingItem.value ? 1 : 0,
     };
-  }, [
-    draggedItemIdDerived.value,
-    isDraggingDerived.value,
-    currentTopValues.value,
-  ]);
+  }, [draggedItemIdDerived.value, isDraggingDerived.value]);
 
   return {
     animatedStyles,

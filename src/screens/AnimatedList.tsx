@@ -24,9 +24,6 @@ export const AnimatedList = () => {
     getInitialPositions(),
   );
 
-  //will hold the top value for any song at every moment
-  const currentTopValues = useSharedValue<TTopValues>(getInitialTopValues());
-
   //used to know if drag is happening or not
   const isDragging = useSharedValue<0 | 1>(0);
 
@@ -55,7 +52,6 @@ export const AnimatedList = () => {
             isDragging={isDragging}
             draggedItemId={draggedItemId}
             currentSongPositions={currentSongPositions}
-            currentTopValues={currentTopValues}
           />
         ))}
       </ScrollView>

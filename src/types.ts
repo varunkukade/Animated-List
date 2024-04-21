@@ -12,7 +12,6 @@ export type TListItem = {
   isDragging: SharedValue<number>;
   draggedItemId: SharedValue<NullableNumber>;
   currentSongPositions: SharedValue<TSongPositions>;
-  currentTopValues: SharedValue<TTopValues>;
 };
 
 export type TSongPositions = {
@@ -20,10 +19,6 @@ export type TSongPositions = {
     updatedIndex: number;
     updatedTop: number;
   };
-};
-
-export type TTopValues = {
-  [key: number]: number;
 };
 
 export type NullableNumber = null | number;

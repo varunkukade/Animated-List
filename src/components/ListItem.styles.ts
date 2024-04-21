@@ -1,5 +1,5 @@
 import {StyleSheet} from 'react-native';
-import {SONG_HEIGHT} from '../constants';
+import {Color_Pallete, SONG_HEIGHT} from '../constants';
 
 export const styles = StyleSheet.create({
   itemContainer: {
@@ -21,9 +21,9 @@ export const styles = StyleSheet.create({
   description1: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: 'white',
+    color: Color_Pallete.crystal_white,
   },
-  description2: {color: 'grey'},
+  description2: {color: Color_Pallete.silver_storm},
   draggerContainer: {
     width: '20%',
     alignItems: 'center',
@@ -35,7 +35,7 @@ export const styles = StyleSheet.create({
   dragger: {
     width: '30%',
     height: 2,
-    backgroundColor: 'white',
+    backgroundColor: Color_Pallete.crystal_white,
   },
   image: {
     height: SONG_HEIGHT - 20,
