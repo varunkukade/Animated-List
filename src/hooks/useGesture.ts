@@ -31,13 +31,11 @@ export const useGesture = (
   //used for swapping with newIndex
   const currentIndex = useSharedValue<NullableNumber>(null);
 
-  const currentPositionsDerived = useDerivedValue(() => {
+  const currentSongPositionsDerived = useDerivedValue(() => {
     return currentSongPositions.value;
   });
 
-  const top = useSharedValue(
-    currentPositionsDerived.value[item.id].updatedIndex * SONG_HEIGHT,
-  );
+  const top = useSharedValue(item.id * SONG_HEIGHT);
 
   const isDraggingDerived = useDerivedValue(() => {
     return isDragging.value;
@@ -49,7 +47,7 @@ export const useGesture = (
 
   useAnimatedReaction(
     () => {
-      return currentPositionsDerived.value[item.id].updatedIndex;
+      return currentSongPositionsDerived.value[item.id].updatedIndex;
     },
     (currentValue, previousValue) => {
       if (currentValue !== previousValue) {
@@ -58,11 +56,13 @@ export const useGesture = (
           item.id === draggedItemIdDerived.value
         ) {
           top.value = withSpring(
-            currentPositionsDerived.value[item.id].updatedIndex * SONG_HEIGHT,
+            currentSongPositionsDerived.value[item.id].updatedIndex *
+              SONG_HEIGHT,
           );
         } else {
           top.value = withTiming(
-            currentPositionsDerived.value[item.id].updatedIndex * SONG_HEIGHT,
+            currentSongPositionsDerived.value[item.id].updatedIndex *
+              SONG_HEIGHT,
             {duration: 500},
           );
         }
@@ -96,7 +96,8 @@ export const useGesture = (
       draggedItemId.value = item.id;
 
       //store dragged item id for future swap
-      currentIndex.value = currentPositionsDerived.value[item.id].updatedIndex;
+      currentIndex.value =
+        currentSongPositionsDerived.value[item.id].updatedIndex;
     })
     .onUpdate(e => {
       if (draggedItemIdDerived.value === null) {
@@ -104,8 +105,8 @@ export const useGesture = (
       }
 
       const newTop =
-        currentPositionsDerived.value[draggedItemIdDerived.value].updatedTop +
-        e.translationY;
+        currentSongPositionsDerived.value[draggedItemIdDerived.value]
+          .updatedTop + e.translationY;
 
       if (
         currentIndex.value === null ||
@@ -124,13 +125,13 @@ export const useGesture = (
         //find id of the item that currently resides at newIndex
         const newIndexItemKey = getKeyOfValue(
           newIndex.value,
-          currentPositionsDerived.value,
+          currentSongPositionsDerived.value,
         );
 
         //find id of the item that currently resides at currentIndex
         const currentDragIndexItemKey = getKeyOfValue(
           currentIndex.value,
-          currentPositionsDerived.value,
+          currentSongPositionsDerived.value,
         );
 
         if (
@@ -139,14 +140,14 @@ export const useGesture = (
         ) {
           //we update updatedTop and updatedIndex as next time we want to do calculations from new top value and new index
           currentSongPositions.value = {
-            ...currentPositionsDerived.value,
+            ...currentSongPositionsDerived.value,
             [newIndexItemKey]: {
-              ...currentPositionsDerived.value[newIndexItemKey],
+              ...currentSongPositionsDerived.value[newIndexItemKey],
               updatedIndex: currentIndex.value,
               updatedTop: currentIndex.value * SONG_HEIGHT,
             },
             [currentDragIndexItemKey]: {
-              ...currentPositionsDerived.value[currentDragIndexItemKey],
+              ...currentSongPositionsDerived.value[currentDragIndexItemKey],
               updatedIndex: newIndex.value,
             },
           };
@@ -164,16 +165,15 @@ export const useGesture = (
       //find original id of the item that currently resides at currentIndex
       const currentDragIndexItemKey = getKeyOfValue(
         currentIndex.value,
-        currentPositionsDerived.value,
+        currentSongPositionsDerived.value,
       );
 
       if (currentDragIndexItemKey !== undefined) {
         //update the values for item whose drag we just stopped
         currentSongPositions.value = {
-          ...currentPositionsDerived.value,
+          ...currentSongPositionsDerived.value,
           [currentDragIndexItemKey]: {
-            ...currentPositionsDerived.value[currentDragIndexItemKey],
-            updatedIndex: newIndex.value,
+            ...currentSongPositionsDerived.value[currentDragIndexItemKey],
             updatedTop: newIndex.value * SONG_HEIGHT,
           },
         };
