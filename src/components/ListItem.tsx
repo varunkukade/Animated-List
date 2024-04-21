@@ -12,8 +12,7 @@ export const ListItem = ({
   isDragging,
   draggedItemId,
   currentSongPositions,
-}: // updateTotalHeight,
-TListItem) => {
+}: TListItem) => {
   const {animatedStyles, gesture} = useGesture(
     item,
     isDragging,
@@ -22,13 +21,7 @@ TListItem) => {
   );
 
   return (
-    <Animated.View
-      // onLayout={event => {
-      //   const {height} = event.nativeEvent.layout;
-      //   updateTotalHeight(height);
-      // }}
-      key={item.id}
-      style={[styles.itemContainer, animatedStyles]}>
+    <Animated.View key={item.id} style={[styles.itemContainer, animatedStyles]}>
       <View style={styles.imageContainer}>
         <Image
           source={{

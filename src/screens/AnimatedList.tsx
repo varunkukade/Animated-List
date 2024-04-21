@@ -37,12 +37,6 @@ export const AnimatedList = () => {
   //   [currentDragIndex],
   // );
 
-  // const [totalHeight, setTotalHeight] = useState(0);
-
-  // const updateTotalHeight = (height: number) => {
-  //   setTotalHeight(prevTotal => prevTotal + height);
-  // };
-
   return (
     <View style={styles.listContainer}>
       <ScrollView contentContainerStyle={{height: SONGS.length * SONG_HEIGHT}}>
