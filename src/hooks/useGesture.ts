@@ -116,6 +116,7 @@ export const useGesture = (
         //dragging out of bound
         return;
       }
+      top.value = newTop;
 
       //calculate the new index where drag is headed to
       newIndex.value = Math.floor((newTop + SONG_HEIGHT / 2) / SONG_HEIGHT);
@@ -161,7 +162,7 @@ export const useGesture = (
       if (currentIndex.value === null || newIndex.value === null) {
         return;
       }
-
+      top.value = withSpring(newIndex.value * SONG_HEIGHT);
       //find original id of the item that currently resides at currentIndex
       const currentDragIndexItemKey = getKeyOfValue(
         currentIndex.value,
