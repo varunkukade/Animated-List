@@ -7,9 +7,10 @@ This repository demonstrates a code to create a reusable code for the Draggable 
 	• Once you understand the core logic, you can customize it as per your requirements.
 	• You can utilize the logic as the future library and React native versions will definitely change.
 
-Quick demo:
 
-![listGif](https://github.com/user-attachments/assets/220e74af-9f44-4435-881c-77291967772b)
+
+Quick demo: https://github.com/user-attachments/assets/86493de8-b543-409b-bfe6-e31079d2e2b1
+
 
 
 For a detailed explanation of this code, check out my Medium articles series 👇:
