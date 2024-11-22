@@ -1,6 +1,6 @@
 # Draggable Animated List Component
 
-This repository demonstrates a code to create a reusable component for the Draggable Animated List Component fro stratch.
+This repository demonstrates a code to create a reusable code for the Draggable Animated List Component from stratch.
 
 	• Built on bare react native project.
 	• Utilized react-native-gesture-handler and react-native-reanimated v3.
