@@ -9,7 +9,8 @@ This repository demonstrates a code to create a reusable code for the Draggable 
 
 
 
-Quick demo: https://github.com/user-attachments/assets/86493de8-b543-409b-bfe6-e31079d2e2b1
+Quick demo: 
+![1_6XeYdBeIqxqtgQYY2xvoXw](https://github.com/user-attachments/assets/86a5e107-47cd-40f0-9d54-a1070e41eaca)
 
 
 
