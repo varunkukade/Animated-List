@@ -5,7 +5,7 @@ This repository demonstrates a code to create a reusable code for the Draggable 
 	• Built on bare react native project.
 	• Utilized react-native-gesture-handler and react-native-reanimated v3.
 	• Once you understand the core logic, you can customize it as per your requirements.
-	• You can utilize the logic as the future library and React native versions will definitely change.
+	• You can utilize the logic even if future library and React native versions change.
 
 
 
