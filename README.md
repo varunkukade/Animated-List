@@ -16,8 +16,8 @@ Quick demo:
 
 For a detailed explanation of this code, check out my Medium articles series 👇:
 
-Part 1: [Part 1: React native drag & drop list (60 FPS) from scratch using Reanimated 3 + RNGH](https://medium.com/@varunkukade999/part-1-react-native-drag-drop-list-60-fps-from-scratch-using-reanimated-3-rngh-63c934189bfe)
+[Part 1: React native drag & drop list (60 FPS) from scratch using Reanimated 3 + RNGH](https://medium.com/@varunkukade999/part-1-react-native-drag-drop-list-60-fps-from-scratch-using-reanimated-3-rngh-63c934189bfe)
 
-Part 2: [Part 2: React native drag & drop list (60 FPS) from scratch using Reanimated 3 + RNGH](https://medium.com/@varunkukade999/part-2-react-native-drag-drop-list-60-fps-from-scratch-using-reanimated-3-rngh-078048354ad9)
+[Part 2: React native drag & drop list (60 FPS) from scratch using Reanimated 3 + RNGH](https://medium.com/@varunkukade999/part-2-react-native-drag-drop-list-60-fps-from-scratch-using-reanimated-3-rngh-078048354ad9)
 
-Part 3: [Part 3: React native drag & drop list (60 FPS) from scratch using Reanimated 3 + RNGH](https://medium.com/@varunkukade999/part-3-react-native-drag-drop-list-60-fps-from-scratch-using-reanimated-3-rngh-a9d29ad43735)
+[Part 3: React native drag & drop list (60 FPS) from scratch using Reanimated 3 + RNGH](https://medium.com/@varunkukade999/part-3-react-native-drag-drop-list-60-fps-from-scratch-using-reanimated-3-rngh-a9d29ad43735)
