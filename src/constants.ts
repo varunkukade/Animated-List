@@ -1,3 +1,4 @@
+import {Dimensions, Platform} from 'react-native';
 import {TSongPositions} from './types';
 
 export const SONG_HEIGHT = 80;
@@ -133,7 +134,12 @@ export const Color_Pallete = {
   silver_storm: '#808080',
 };
 
-export const ANIMATION_DURATION = 600;
+export const isAndroid = Platform.OS === 'android';
+export const isIOS = Platform.OS === 'ios';
 
+export const ANIMATION_DURATION = 600;
 export const MIN_BOUNDRY = 0;
 export const MAX_BOUNDRY = (SONGS.length - 1) * SONG_HEIGHT;
+export const SCREEN_HEIGHT = Dimensions.get('window').height;
+export const EDGE_THRESHOLD = 40;
+export const SCROLL_SPEED_OFFSET = isAndroid ? 2 : 3;
